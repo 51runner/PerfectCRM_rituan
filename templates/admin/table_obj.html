@@ -1,0 +1,274 @@
+{% extends "bases.html" %}
+{% load tags %}
+{% block css %}
+    <link href="/static/css/plugins/footable/footable.core.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/field.css">
+
+    <style>
+        .customize {
+            background-color: #ffffff;
+            border-color: #e7eaec;
+            border-image: none;
+            border-style: solid solid none;
+            border-width: 3px 0 0;
+            color: inherit;
+            margin-bottom: -50px;
+            padding: 14px 15px 7px;
+            min-height: 48px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="row wrapper border-bottom white-bg page-heading">
+        <div class="col-sm-4">
+            <h2>管理客户</h2>
+            <ol class="breadcrumb">
+                <li>
+                    <a href="#">This is</a>
+                </li>
+                <li class="active">
+                    <strong>Client Library</strong>
+                </li>
+            </ol>
+        </div>
+        <div class="col-sm-8">
+            <div class="title-action">
+                {% if  admin_class.readonly_table %}
+                    <a href="{{ request.path }}add/" class="btn btn-primary">添加客户</a>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+    <div class="wrapper wrapper-content animated fadeInRight">
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="customize ibox float-e-margins">
+                    <div id="main">
+                        <div class="demo">
+                            <ul class="select">
+
+
+                                {% for filter_field in admin_class.list_filter %}
+                                    <li class="select-list">
+                                        {% render_filter_ele filter_field admin_class filter_condtions filter_url 1 %}
+                                    </li>
+                                {% endfor %}
+
+                                <li class="select-result">
+                                    <dl>
+                                        <dt>已选条件：</dt>
+
+                                        {% for filter_field in admin_class.list_filter %}
+                                            {% render_filter_ele filter_field admin_class filter_condtions filter_url 2 %}
+
+                                        {% endfor %}
+
+
+                                    </dl>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="wrapper wrapper-content animated fadeInRight">
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>所有客户</h5>
+
+
+                    </div>
+
+
+                    <div class="ibox-content">
+                        <div class="row">
+                            <form action="" onsubmit="ActionSubmit(this);" method="post">{% csrf_token %}
+                                <div class="col-sm-3 m-b-xs"><select class="input-sm form-control input-s-sm inline">
+
+                                    <option value="">未选</option>
+                                    {% for actions in admin_class.actions %}
+                                        <option value="{{ actions }}">{{ actions }}</option>
+                                    {% endfor %}
+
+                                </select>
+                                </div>
+
+                                <div class="col-sm-6 m-b-xs">
+                                    <button type="submit" class="btn btn-primary btn-sm"
+                                            style="margin-left: -29px;">Go !
+                                    </button>
+
+                                </div>
+                            </form>
+                            <form class="" method="get">
+                                <div class="col-sm-3">
+                                    <div class="input-group"><input type="search" placeholder="Search by" name="_q"
+                                                                    value="{{ search_key }}"
+                                                                    class="input-sm form-control"> <span
+                                            class="input-group-btn">
+                                        <button type="submit" class="btn btn-sm btn-primary">搜索</button> </span></div>
+                                </div>
+                            </form>
+                        </div>
+
+                        <table class="footable table table-stripped toggle-arrow-tiny footable-loaded tablet breakpoint"
+                               data-page-size="8">
+                            <thead>
+                            <tr>
+
+
+                                <th class="footable-visible footable-sortable footable-first-column">
+                                    <input type="checkbox" onclick="CheckAllToggle(this);"></th>
+
+
+                                {% for column in admin_class.list_display %}
+                                    {% build_table_header_column column orderby_key filter_condtions admin_class %}
+                                {% endfor %}
+
+
+                            </tr>
+
+                            </thead>
+                            <tbody>
+
+
+                            {% for obj in query_sets %}
+
+                                <tr class="footable-even" style="display: table-row;">
+                                    <th><input tag="obj_checkbox" type="checkbox" value="{{ obj.id }}"></th>
+                                    {% build_table_row request obj admin_class %}
+                                </tr>
+
+                            {% endfor %}
+
+
+                            </tbody>
+                            <tfoot>
+
+                            <tr>
+                                <td colspan="12" class="footable-visible">
+                                    <span>一共为您检索 <strong>{{ object_list_count }}</strong> 条数据</span>
+                                    <ul class="pagination pull-right">
+                                        {% if query_sets.has_previous %}
+                                            <li class=""><a href="?page={{ query_sets.previous_page_number }}">上页</a>
+                                            </li>
+                                        {% endif %}
+
+                                        {% build_paginators query_sets filter_condtions previous_orderby search_key %}
+
+                                        {% if query_sets.has_next %}
+                                            <li class=""><a href="?page={{ query_sets.next_page_number }}">下页</a></li>
+                                        {% endif %}
+                                    </ul>
+                                </td>
+                            </tr>
+                            </tfoot>
+                        </table>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block js %}
+    <script src="/static/js/plugins/footable/footable.all.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $("#side-menu > li").click(function () {
+                $(this).addClass("active").siblings(this).removeClass("active");
+            });
+
+            $("#select1 dd").click(function () {
+                $(this).addClass("selected").siblings("dd").removeClass("selected");
+                var $obj = $(this).clone();
+
+
+            });
+
+            $("#select2 dd").click(function () {
+                $(this).addClass("selected").siblings("dd").removeClass("selected");
+                var $obj = $(this).clone();
+
+
+            });
+
+            $("#select3 dd").click(function () {
+                $(this).addClass("selected").siblings("dd").removeClass("selected");
+                var $obj = $(this).clone();
+
+
+            });
+
+
+            $(".select").on("click", "dd", function () {
+                if ($(".select-result dd").length > 1) {
+                    $(".select-no").hide();
+                } else {
+                    $(".select-no").show();
+                }
+            });
+
+
+            function CheckAllToggle(ele) {
+                if ($(ele).prop("checked")) {
+                    $("input[tag='obj_checkbox']").prop("checked", true);
+                } else {
+                    $("input[tag='obj_checkbox']").prop("checked", false);
+                }
+            }
+
+            function ActionSubmit(form_ele) {
+                var selected_ids = [];
+                $("input[tag='obj_checkbox']:checked").each(function () {
+                    selected_ids.push($(this).val());
+                });
+                var selected_action = $("#action_list").val();
+                console.log(selected_ids);
+                console.log(selected_action);
+                if (selected_ids.length == 0) {
+                    alert("No object got selected!");
+                    return
+                }
+                if (!selected_action) {
+                    alert("No action got selected!");
+                }
+
+
+                //start submit
+                var selected_ids_ele = "<input  name='selected_ids' type='hidden' value='" + selected_ids.toString() + "' >";
+                $(form_ele).append(selected_ids_ele);
+
+                return true;
+            }
+
+
+            $(".select-result .selected a").click(function () {
+                var a = $(this).attr("a");
+                var removertag = $(this).attr("tag");
+
+                var reg = new RegExp(removertag + '=', 'g');
+                result = a.replace(reg, '');
+                location.href = result;
+            });
+
+
+            if ($(".select-result .selected").length == 0) {
+                content_result = '<dd class="select-no" style="display: block;margin-left: 15px;">暂时没有选择过滤条件</dd>'
+                $(".select-result dt").after(content_result);
+            }
+        })
+    </script>
+{% endblock %}

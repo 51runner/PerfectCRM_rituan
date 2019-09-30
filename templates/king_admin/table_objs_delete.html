@@ -1,0 +1,41 @@
+{% extends 'king_admin/table_index.html' %}
+{% load crm_tags %}
+
+{% block container %}
+
+    <div class="row wrapper border-bottom white-bg page-heading">
+        <div class="col-sm-4">
+            <h2>编辑客户</h2>
+            <ol class="breadcrumb">
+                <li>
+                    <a href="#">This is</a>
+                </li>
+                <li class="active">
+                    <strong>Edit customer</strong>
+                </li>
+            </ol>
+        </div>
+
+    </div>
+
+    <div class="wrapper wrapper-content animated fadeInRight">
+
+        <div class="row">
+            <div class="col-lg-12">
+
+                {% display_obj_related objs %}
+
+
+                <form method="post">{% csrf_token %}
+                    <input type="submit" class="btn btn-danger" value="Yes,I'm sure">
+                    <input type="hidden" value="yes" name="delete_confirm">
+                    <input type="hidden" value="{{ selected_ids }}" name="selected_ids">
+                    <input type="hidden" value="{{ action }}" name="action">
+                    <a class="btn btn-info" href="{% url 'table_objs' app_name table_name %}">No,Take me back</a>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}

@@ -1,0 +1,162 @@
+{% extends 'bases.html' %}
+{% load crm_tags %}
+{% block css %}
+    <!-- Sweet Alert -->
+    <link href="/static/css/plugins/sweetalert/sweetalert.css" rel="stylesheet">
+
+    <link href="/static/css/plugins/dropzone/basic.css" rel="stylesheet">
+    <link href="/static/css/plugins/dropzone/dropzone.css" rel="stylesheet">
+
+
+    <link href="/static/css/plugins/steps/jquery.steps.css" rel="stylesheet">
+    <style>
+        .errorlist li {
+            list-style: none;
+        }
+
+        #url-next a {
+            display: block;
+            float: left;
+        }
+    </style>
+
+{% endblock %}
+
+{% block content %}
+    <div class="row wrapper border-bottom white-bg page-heading">
+        <div class="col-sm-4">
+            <h2>学员报名</h2>
+            <ol class="breadcrumb">
+                <li>
+                    <a href="#">This is</a>
+                </li>
+                <li class="active">
+                    <strong>Student enrollment</strong>
+                </li>
+            </ol>
+        </div>
+
+    </div>
+
+
+    <div class="wrapper wrapper-content animated fadeInRight">
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="ibox">
+                    <div class="ibox-title">
+                        <h5>第三步学员缴费</h5>
+
+                    </div>
+                    <div class="ibox-content">
+
+
+                        <div id="form" class="wizard-big wizard clearfix" role="application"
+                             novalidate="novalidate">{% csrf_token %}
+                            <div class="steps clearfix">
+                                <ul role="tablist">
+                                    <li role="tab" class="disabled" aria-disabled="false" aria-selected="true"><a
+                                            id="form-t-0" href="javascript:void(0);" aria-controls="form-p-0"><span
+                                            class="current-info audible">current step: </span><span
+                                            class="number">1.</span> 第一步 / 学员资料</a></li>
+                                    <li role="tab" class="disabled" aria-disabled="true"><a id="form-t-1"
+                                                                                            href="javascript:void(0);"
+                                                                                            aria-controls="form-p-1"><span
+                                            class="number">2.</span> 第二步 / 填补资料</a></li>
+                                    <li role="tab" class="first current" aria-disabled="true"><a id="form-t-2"
+                                                                                                 href="javascript:void(0);"
+                                                                                                 aria-controls="form-p-2"><span
+                                            class="number">3.</span> 第三步 / 资料审核</a></li>
+                                    <li role="tab" class="disabled last" aria-disabled="true"><a id="form-t-3"
+                                                                                                 href="javascript:void(0);"
+                                                                                                 aria-controls="form-p-3"><span
+                                            class="number">4.</span> 第四步 / 学员缴费记录</a></li>
+                                </ul>
+                            </div>
+                            <div class="content clearfix" style="min-height: 860px">
+                                <h1 id="form-h-0" tabindex="-1" class="title current">第一步</h1>
+                                <fieldset id="form-p-0" role="tabpanel" aria-labelledby="form-h-0" class="body current"
+                                          aria-hidden="false">
+                                    <div class="row">
+
+
+                                        <div class="col-lg-8" style="margin-top: 35px;">
+                                            <h4 style="    color: #F7F;">学员基本信息审核</h4>
+                                            <div id="msg"></div>
+                                            {% if pyament_form.errors %}
+                                                <div class="alert alert-danger">
+                                                    {{ pyament_form.errors }}
+                                                </div>
+                                            {% endif %}
+                                            {% if pyament_form.errors or msgs.msg %}
+                                                <div class="alert alert-danger xxoo">
+                                                    {{ enroll_form.errors }}
+                                                    {{ msgs.msg }}
+                                                </div>
+                                            {% endif %}
+
+
+
+                                            {{ customer_form.as_table }}
+
+
+                                            <hr style=" height:2px;border:none;border-top:2px dotted #185598;">
+                                            <h4 style="color: #F7F;">报名信息</h4>
+                                            {{ enroll_form.as_p }}
+
+
+                                        </div>
+
+
+                                        <div class="col-lg-4">
+                                            <div class="text-center">
+                                                <div style="margin-top: 20px">
+                                                    <i class="fa fa-meh-o"
+                                                       style="font-size: 180px;color: #e5e5e5 "></i>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </fieldset>
+                                <h1 id="form-h-1" tabindex="-1" class="title">Profile</h1>
+
+                                <h1 id="form-h-2" tabindex="-1" class="title">Warning</h1>
+
+                                <h1 id="form-h-3" tabindex="-1" class="title">Finish</h1>
+                            </div>
+                            <div class="actions clearfix">
+                                <ul role="menu" aria-label="Pagination" id="url-next">
+                                    <a href="{% url 'enrollment_rejection' enroll_obj.id %}" class="btn btn-w-m "
+                                       style="margin-right:25px">驳回合同</a>
+                                    <a href="{% url 'payment_2' enroll_obj.id %}" class="btn btn-w-m " style="background: #f8ac59;">下一步</a>
+                                </ul>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block js %} <!-- Sweet alert -->
+    <script src="/static/js/plugins/sweetalert/sweetalert.min.js"></script>
+
+
+
+
+    <script>
+
+        $(document).ready(function () {
+
+
+        })
+    </script>
+
+{% endblock %}

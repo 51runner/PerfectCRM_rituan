@@ -1,0 +1,232 @@
+{% extends 'king_admin/table_index.html' %}
+
+{% load crm_tags %}
+
+{% block css %}
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        ul, li {
+            list-style: none;
+        }
+
+        .filter-list ul {
+            background: #F0F0F0;
+
+            line-height: 35px;
+            margin: 0;
+            margin-top: 3px;
+        }
+
+        .filter-list li {
+            display: inline;
+            margin-left: 23px;
+
+        }
+
+        .selected {
+            background: #d0d0d0;
+            padding: 9.5px;
+            border-radius: 3px;
+        }
+
+
+    </style>
+{% endblock %}
+
+{% block container %}
+
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <div class="row">
+                <div class="col-md-2">
+                    <h3 class="panel-title">{% get_model_name admin_class %}</h3>
+                </div>
+                <div class="col-md-1 pull-right">
+                    <a href="{{ request.path }}add/" class="btn btn-default btn-rounded btn-sm">Add</a>
+                </div>
+            </div>
+        </div>
+        <div class="panel-body">
+            <form action="" onsubmit="ActionSubmit(this);" method="post">{% csrf_token %}
+                <div class="col-sm-2" style="margin-left: -15px; width: 200px">
+                    <select name="action" class="form-control" id="action_list">
+                        <option value="">未选</option>
+                        {% for actions in admin_class.actions %}
+                            <option value="{{ actions }}">{{ actions }}</option>
+                        {% endfor %}
+                    </select>
+
+                </div>
+                <button type="submit" class="btn btn-info btn-sm"
+                        style="margin: 2px -11px;position: absolute;">Go
+                </button>
+            </form>
+
+
+            {% if qq_search == 'Customer' %}
+                <form method="get">
+                    <div class="col-sm-2" style="position: absolute;margin-left: 67.5%;margin-top: -32px;">
+                        <input type="search" style="display: block; margin-top: 32px;" name="qq" class="form-control"
+                               value="{{ filter_condtions.qq }}" placeholder="QQ全局搜索">
+                        <button type="submit"
+                                style="position: absolute;top: 29.5px;right: 13px;height: 29px;margin: 5px;padding: 4px 11px;"
+                                class="btn btn-info btn-sm">搜索
+                        </button>
+                    </div>
+                </form>
+            {% else %}
+
+            {% endif %}
+            <form class="" method="get">
+                <div class="row" style="margin-bottom: 20px">
+
+                    <div class="col-sm-4" style="margin-left: 43px;">
+                        <div class="input-group">
+                            <input type="search" class="form-control"
+                                   placeholder="Search by {% for items in search_by %}{{ items }},{% endfor %}
+                            " name="_q" value="{{ search_key }}">
+                            <span class="input-group-btn">
+                                <button class="btn btn-default btn-info" type="submit">搜索</button>
+                            </span>
+                        </div>
+                    </div>
+
+
+                </div>
+
+
+                <div class="row" style="border: 1px solid #D9EDF7; margin-bottom: 20px;">
+
+                    {% for filter_field in admin_class.list_filter %}
+{#                        <div class="col-xs-2">#}
+{#                            <div class="text-center"#}
+{#                                 style=" line-height: 37px; font-size: 16px; font-weight: bold">{{ filter_field }}</div>#}
+{##}
+{#                        </div>#}
+                        <div class="col-xs-12 filter-list">
+                            {% render_filter_ele filter_field admin_class filter_condtions filter_url %}
+                        </div>
+                    {% endfor %}
+
+
+                </div>
+
+
+            </form>
+
+
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th><input type="checkbox" onclick="CheckAllToggle(this);"></th>
+                    {% for column in admin_class.list_display %}
+                        {% build_table_header_column column orderby_key filter_condtions %}
+                    {% endfor %}
+                </tr>
+                </thead>
+                <tbody>
+                {#                {% get_query_sets admin_class as query_sets %}#}
+                {% for obj in query_sets %}
+
+                    <tr>
+                        <th><input tag="obj_checkbox" type="checkbox" value="{{ obj.id }}"></th>
+                        {% build_table_row request obj admin_class %}
+                    </tr>
+
+                {% endfor %}
+
+
+                </tbody>
+            </table>
+            <span>一共为您检索 <strong>{{ object_list_count }}</strong> 条数据</span>
+
+
+            <nav>
+                <ul class="pagination">
+
+                    {% if query_sets.has_previous %}
+                        <li class=""><a href="?page={{ query_sets.previous_page_number }}">上页</a></li>
+                    {% endif %}
+
+                    {#                    {% for loop_cunter in query_sets.paginator.page_range %}#}
+                    {#                        {% render_page_ele loop_cunter query_sets filter_condtions %}#}
+                    {#                    {% endfor %}#}
+
+
+                    {% build_paginators query_sets filter_condtions previous_orderby search_key %}
+
+
+
+
+                    {% if query_sets.has_next %}
+                        <li class=""><a href="?page={{ query_sets.next_page_number }}">下页</a></li>
+                    {% endif %}
+
+
+                </ul>
+            </nav>
+
+
+        </div>
+    </div>
+
+
+    <script>
+        function CheckAllToggle(ele) {
+            if ($(ele).prop("checked")) {
+                $("input[tag='obj_checkbox']").prop("checked", true);
+            } else {
+                $("input[tag='obj_checkbox']").prop("checked", false);
+            }
+        }
+        function ActionSubmit(form_ele) {
+            var selected_ids = [];
+            $("input[tag='obj_checkbox']:checked").each(function () {
+                selected_ids.push($(this).val());
+            });
+            var selected_action = $("#action_list").val();
+            console.log(selected_ids);
+            console.log(selected_action);
+            if (selected_ids.length == 0) {
+                alert("No object got selected!");
+                return
+            }
+            if (!selected_action) {
+                alert("No action got selected!");
+            }
+
+
+            //start submit
+            var selected_ids_ele = "<input  name='selected_ids' type='hidden' value='" + selected_ids.toString() + "' >";
+            $(form_ele).append(selected_ids_ele);
+
+            return true;
+        }
+
+
+    </script>
+{% endblock %}
+{% block js %}
+    <script>
+        $(document).ready(function () {
+            $(".selected a").click(function () {
+                var a = $(this).attr("href");
+                var removertag = $(this).attr("tag");
+
+                var reg = new RegExp(removertag + '=', 'g');
+                result = a.replace(reg, '');
+                location.href = result;
+
+                //alert(a.replace(removertag +'=',''));
+                //alert(removertag)
+            })
+        })
+    </script>
+{% endblock %}
+
+
+

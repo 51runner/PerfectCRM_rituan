@@ -1,0 +1,328 @@
+{% extends "bases.html" %}
+{% load tags %}
+{% block css %}
+    <link href="/static/css/plugins/footable/footable.core.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/field.css">
+
+    <style>
+        .customize {
+            background-color: #ffffff;
+            border-color: #e7eaec;
+            border-image: none;
+            border-style: solid solid none;
+            border-width: 3px 0 0;
+            color: inherit;
+            margin-bottom: -50px;
+            padding: 14px 15px 7px;
+            min-height: 48px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="row wrapper border-bottom white-bg page-heading">
+        <div class="col-sm-4">
+            <h2>客户库</h2>
+            <ol class="breadcrumb">
+                <li>
+                    <a href="#">This is</a>
+                </li>
+                <li class="active">
+                    <strong>Breadcrumb</strong>
+                </li>
+            </ol>
+        </div>
+        <div class="col-sm-8">
+            <div class="title-action">
+                <a href="" class="btn btn-primary">添加客户</a>
+            </div>
+        </div>
+    </div>
+    <div class="wrapper wrapper-content animated fadeInRight">
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="customize ibox float-e-margins">
+                    <div id="main">
+                        <div class="demo">
+                            <ul class="select">
+                                <li class="select-list">
+                                    <dl id="select1">
+                                        <dt>上装：</dt>
+                                        <dd class="select-all selected"><a href="#">全部</a></dd>
+                                        <dd><a href="#">针织衫</a></dd>
+                                        <dd><a href="##">毛呢外套</a></dd>
+                                        <dd><a href="###">T恤</a></dd>
+                                        <dd><a href="####">羽绒服</a></dd>
+                                        <dd><a href="#####">棉衣</a></dd>
+                                        <dd><a href="######">卫衣</a></dd>
+                                        <dd><a href="#######">风衣</a></dd>
+                                    </dl>
+                                </li>
+                                <li class="select-list">
+                                    <dl id="select2">
+                                        <dt>裤装：</dt>
+                                        <dd class="select-all selected"><a href="#">全部</a></dd>
+                                        <dd><a href="#">牛仔裤</a></dd>
+                                        <dd><a href="#">小脚/铅笔裤</a></dd>
+                                        <dd><a href="#">休闲裤</a></dd>
+                                        <dd><a href="#">打底裤</a></dd>
+                                        <dd><a href="#">哈伦裤</a></dd>
+                                    </dl>
+                                </li>
+                                <li class="select-list">
+                                    <dl id="select3">
+                                        <dt>裙装：</dt>
+                                        <dd class="select-all selected"><a href="#">全部</a></dd>
+                                        <dd><a href="#">连衣裙</a></dd>
+                                        <dd><a href="#">半身裙</a></dd>
+                                        <dd><a href="#">长袖连衣裙</a></dd>
+                                        <dd><a href="#">中长款连衣裙</a></dd>
+                                    </dl>
+                                </li>
+                                <li class="select-result">
+                                    <dl>
+                                        <dt>已选条件：</dt>
+                                        <dd class="select-no">暂时没有选择过滤条件</dd>
+                                    </dl>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="wrapper wrapper-content animated fadeInRight">
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>所有客户</h5>
+
+
+                    </div>
+
+
+                    <div class="ibox-content">
+                        <div class="row">
+                            <form action="" onsubmit="ActionSubmit(this);" method="post">{% csrf_token %}
+                                <div class="col-sm-3 m-b-xs"><select class="input-sm form-control input-s-sm inline">
+
+                                    <option value="">未选</option>
+                                    {% for actions in admin_class.actions %}
+                                        <option value="{{ actions }}">{{ actions }}</option>
+                                    {% endfor %}
+
+                                </select>
+                                </div>
+
+                                <div class="col-sm-6 m-b-xs">
+                                    <button type="submit" class="btn btn-primary btn-sm"
+                                            style="margin-left: -29px;">Go
+                                    </button>
+
+                                </div>
+                            </form>
+                            <form class="" method="get">
+                                <div class="col-sm-3">
+                                    <div class="input-group"><input type="search" placeholder="Search by" name="_q"
+                                                                    value="{{ search_key }}"
+                                                                    class="input-sm form-control"> <span
+                                            class="input-group-btn">
+                                        <button type="submit" class="btn btn-sm btn-primary"> Go!</button> </span></div>
+                                </div>
+                            </form>
+                        </div>
+
+                        <table class="footable table table-stripped toggle-arrow-tiny footable-loaded tablet breakpoint"
+                               data-page-size="8">
+                            <thead>
+                            <tr>
+
+
+                                <th class="footable-visible footable-sortable footable-first-column">
+                                    <input type="checkbox" onclick="CheckAllToggle(this);"></th>
+
+
+                                {% for column in admin_class.list_display %}
+                                    {% build_table_header_column column orderby_key filter_condtions %}
+                                {% endfor %}
+
+
+                            </tr>
+
+                            </thead>
+                            <tbody>
+
+
+                            {% for obj in query_sets %}
+
+                                <tr class="footable-even" style="display: table-row;">
+                                    <th><input tag="obj_checkbox" type="checkbox" value="{{ obj.id }}"></th>
+                                    {% build_table_row request obj admin_class %}
+                                </tr>
+
+                            {% endfor %}
+
+
+                            </tbody>
+                            <tfoot>
+                            <tr>
+                                <td colspan="12" class="footable-visible">
+                                    <ul class="pagination pull-right">
+                                        {% if query_sets.has_previous %}
+                                            <li class=""><a href="?page={{ query_sets.previous_page_number }}">上页</a>
+                                            </li>
+                                        {% endif %}
+
+                                        {% build_paginators query_sets filter_condtions previous_orderby search_key %}
+
+                                        {% if query_sets.has_next %}
+                                            <li class=""><a href="?page={{ query_sets.next_page_number }}">下页</a></li>
+                                        {% endif %}
+                                    </ul>
+                                </td>
+                            </tr>
+                            </tfoot>
+                        </table>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block js %}
+    <script src="/static/js/plugins/footable/footable.all.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $("#side-menu > li").click(function () {
+                $(this).addClass("active").siblings(this).removeClass("active");
+            });
+
+            $("#select1 dd").click(function () {
+                $(this).addClass("selected").siblings("dd").removeClass("selected");
+                var $obj = $(this).clone();
+
+                if ($(this).hasClass("select-all")) {
+                    $("#selectA").remove();
+                } else {
+
+                    if ($(".select-result").find("#selectA").length > 0) {
+                        //$("#selectA a").html($(this).text()); #直接替换则不会替换a标签
+                        $("#selectA").remove();  //先删除原有的HTML  然后再添加a标签也是最新
+                        $(".select-result dl").append($obj.attr("id", "selectA"));
+                    } else {
+                        $(".select-result dl").append($obj.attr("id", "selectA"));
+                    }
+                }
+
+            });
+
+            $("#select2 dd").click(function () {
+                $(this).addClass("selected").siblings("dd").removeClass("selected");
+                var $obj = $(this).clone();
+
+                if ($(this).hasClass("select-all")) {
+                    $("#selectB").remove();
+                } else {
+
+                    if ($(".select-result").find("#selectB").length > 0) {
+                        //$("#selectB a").html($(this).text()); #直接替换则不会替换a标签
+                        $("#selectB").remove();  //先删除原有的HTML  然后再添加a标签也是最新
+                        $(".select-result dl").append($obj.attr("id", "selectB"));
+                    } else {
+                        $(".select-result dl").append($obj.attr("id", "selectB"));
+                    }
+                }
+
+            });
+
+            $("#select3 dd").click(function () {
+                $(this).addClass("selected").siblings("dd").removeClass("selected");
+                var $obj = $(this).clone();
+
+                if ($(this).hasClass("select-all")) {
+                    $("#selectC").remove();
+                } else {
+
+                    if ($(".select-result").find("#selectC").length > 0) {
+                        //$("#selectC a").html($(this).text()); #直接替换则不会替换a标签
+                        $("#selectC").remove();  //先删除原有的HTML  然后再添加a标签也是最新
+                        $(".select-result dl").append($obj.attr("id", "selectC"));
+                    } else {
+                        $(".select-result dl").append($obj.attr("id", "selectC"));
+                    }
+                }
+
+            });
+
+            $(".select-result ").on("click", "#selectA", function () {
+                $(this).remove();
+                $("#select1 .select-all").addClass("selected").siblings("dd").removeClass("selected")
+
+            });
+
+
+            $(".select-result ").on("click", "#selectB", function () {
+                $(this).remove();
+                $("#select2 .select-all").addClass("selected").siblings("dd").removeClass("selected")
+
+            });
+
+            $(".select-result").on("click", "#selectC", function () {
+                $(this).remove();
+                $("#select3 .select-all").addClass("selected").siblings("dd").removeClass("selected")
+
+            });
+
+
+            $(".select").on("click", "dd", function () {
+                if ($(".select-result dd").length > 1) {
+                    $(".select-no").hide();
+                } else {
+                    $(".select-no").show();
+                }
+            });
+
+
+            function CheckAllToggle(ele) {
+                if ($(ele).prop("checked")) {
+                    $("input[tag='obj_checkbox']").prop("checked", true);
+                } else {
+                    $("input[tag='obj_checkbox']").prop("checked", false);
+                }
+            }
+
+            function ActionSubmit(form_ele) {
+                var selected_ids = [];
+                $("input[tag='obj_checkbox']:checked").each(function () {
+                    selected_ids.push($(this).val());
+                });
+                var selected_action = $("#action_list").val();
+                console.log(selected_ids);
+                console.log(selected_action);
+                if (selected_ids.length == 0) {
+                    alert("No object got selected!");
+                    return
+                }
+                if (!selected_action) {
+                    alert("No action got selected!");
+                }
+
+
+                //start submit
+                var selected_ids_ele = "<input  name='selected_ids' type='hidden' value='" + selected_ids.toString() + "' >";
+                $(form_ele).append(selected_ids_ele);
+
+                return true;
+            }
+        })
+    </script>
+{% endblock %}
